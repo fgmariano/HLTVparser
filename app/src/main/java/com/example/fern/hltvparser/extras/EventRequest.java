@@ -1,17 +1,20 @@
 package com.example.fern.hltvparser.extras;
 
 import android.os.AsyncTask;
+
+import com.example.fern.hltvparser.EventActivity;
+import com.example.fern.hltvparser.domain.Event;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.fern.hltvparser.EventActivity;
-import com.example.fern.hltvparser.domain.Event;
 
 /**
  * Created by Fern on 06/03/2017.
@@ -31,28 +34,37 @@ public class EventRequest extends AsyncTask<Void, Void, List<Event>> {
 
         try {
             doc = Jsoup.connect("http://www.hltv.org/events/ongoing/").get();
-            Element events = doc.getElementsByClass("hotmatchbox").first();
-            Elements event = events.select("div[style=padding:5px]");
-            for(Element eventDetails : event) {
+
+            Element events = doc.getElementsByClass("ongoing-events-holder").first();
+            try {
+                Element bigEvents = events.getElementsByClass("big-events").first();
+                for(Element el : bigEvents.getElementsByTag("a")) {
+                    Event e = new Event();
+                    String[] dates = getDates(el);
+                    e.setEvent_name(el.getElementsByClass("big-event-name").text());
+                    e.setEvent_url(el.attr("href"));
+                    e.setEvent_start(dates[0]);
+                    e.setEvent_end(dates[1]);
+                    eventList.add(e);
+                }
+            } catch (Exception err) {
+
+            }
+            Element minor = events.getElementsByClass("ongoing-event-holder").first();
+            for(Element el : minor.getElementsByTag("a")) {
                 Event e = new Event();
-                Element eventTitle = eventDetails.getElementsByClass("eventheadline").first();
-                Element link = eventTitle.getElementsByTag("a").first();
-                e.setEvent_name(link.text());
-                e.setEvent_url("http://hltv.org"+link.attr("href"));
-
-                Element eventStart = eventDetails.getElementsByClass("values").get(0);
-                e.setEvent_start(eventStart.text());
-
-                Element eventEnd = eventDetails.getElementsByClass("values").get(1);
-                e.setEvent_end(eventEnd.text());
-
+                String[] dates = getDates(el);
+                e.setEvent_name(el.getElementsByClass("text-ellipsis").text());
+                e.setEvent_url(el.attr("href"));
+                e.setEvent_start(dates[0]);
+                e.setEvent_end(dates[1]);
                 eventList.add(e);
             }
             return eventList;
         } catch(IOException e) {
             e.printStackTrace();
+            return eventList;
         }
-        return eventList;
     }
 
     @Override
@@ -62,5 +74,17 @@ public class EventRequest extends AsyncTask<Void, Void, List<Event>> {
         if(activity.get() != null) {
             activity.get().updateLista(events);
         }
+    }
+
+    public String[] getDates(Element el) {
+        String[] arr = new String[2];
+        Elements span = el.getElementsByAttribute("data-unix");
+        arr[0] = new SimpleDateFormat("dd/MM").format(Long.parseLong(span.get(0).attr("data-unix")));
+        try {
+            arr[1] = new SimpleDateFormat("dd/MM").format(Long.parseLong(span.get(1).attr("data-unix")));
+        } catch(IndexOutOfBoundsException e) {
+            arr[1] = "----";
+        }
+        return arr;
     }
 }

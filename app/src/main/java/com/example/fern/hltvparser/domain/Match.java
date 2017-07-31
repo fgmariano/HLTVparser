@@ -15,6 +15,7 @@ public class Match implements Parcelable {
     private String score1;
     private String score2;
     private String map;
+    private String date;
 
     public String getTeam1() {
         return team1;
@@ -56,6 +57,14 @@ public class Match implements Parcelable {
         this.map = map;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -68,6 +77,7 @@ public class Match implements Parcelable {
         dest.writeString(this.map);
         dest.writeString(this.score1);
         dest.writeString(this.score2);
+        dest.writeString(this.date);
     }
 
     public Match() {
@@ -79,6 +89,7 @@ public class Match implements Parcelable {
         this.map = in.readString();
         this.score1 = in.readString();
         this.score2 = in.readString();
+        this.date = in.readString();
     }
 
     public static final Parcelable.Creator<Match> CREATOR = new Parcelable.Creator<Match>() {

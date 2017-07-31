@@ -1,14 +1,15 @@
 package com.example.fern.hltvparser;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import java.util.List;
+
 import com.example.fern.hltvparser.domain.Match;
+
+import java.util.List;
 
 /**
  * Created by Fern on 07/03/2017.
@@ -24,6 +25,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         TextView score1;
         TextView score2;
         TextView map;
+        TextView date;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -33,6 +35,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             score1 = (TextView) itemView.findViewById(R.id.score1);
             score2 = (TextView) itemView.findViewById(R.id.score2);
             map = (TextView) itemView.findViewById(R.id.map);
+            date = (TextView) itemView.findViewById(R.id.date);
         }
 
         private void setData(Match match) {
@@ -41,6 +44,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             score1.setText(match.getScore1());
             score2.setText(match.getScore2());
             map.setText(match.getMap());
+            date.setText(match.getDate());
         }
     }
 
